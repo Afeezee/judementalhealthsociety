@@ -1,26 +1,239 @@
 @import "tailwindcss";
 
+/* ---------------------------------------------------------------
+   JMHS design tokens — see build spec §1.1
+   Each colour has one job. Red is reserved for the crisis system.
+--------------------------------------------------------------- */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Brand */
+  --ink: #0B0E14;
+  --trust-blue: #1E3A8A;
+  --trust-blue-light: #3B5FCC;
+  --signal-red: #DC2626;
+  --signal-red-strong: #B91C1C;
+
+  /* Surfaces */
+  --paper: #F6F7FB;
+  --paper-dim: #EDEFF6;
+  --ink-dim: #141821;
+
+  /* Text */
+  --mist: #8891A5;
+  --hairline: rgba(11, 14, 20, 0.12);
+
+  /* Semantic (light-mode defaults) */
+  --bg: var(--paper);
+  --bg-surface: #ffffff;
+  --bg-elevated: var(--paper-dim);
+  --fg: var(--ink);
+  --fg-muted: var(--mist);
+  --brand: var(--trust-blue);
+  --brand-hover: #17306E;
+  --border: var(--hairline);
+
+  /* Type scale factor — hooked to text-size control */
+  --type-scale: 1;
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-fast: 180ms;
+  --dur-med: 320ms;
+  --dur-slow: 620ms;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
+/* Dark mode via data-theme (explicit) or prefers-color-scheme (default) */
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  :root:not([data-theme]) {
+    --bg: var(--ink);
+    --bg-surface: #10141C;
+    --bg-elevated: var(--ink-dim);
+    --fg: #F1F3F8;
+    --fg-muted: #9AA3B8;
+    --brand: var(--trust-blue-light);
+    --brand-hover: #5177E0;
+    --border: rgba(255, 255, 255, 0.10);
   }
 }
+:root[data-theme="dark"] {
+  --bg: var(--ink);
+  --bg-surface: #10141C;
+  --bg-elevated: var(--ink-dim);
+  --fg: #F1F3F8;
+  --fg-muted: #9AA3B8;
+  --brand: var(--trust-blue-light);
+  --brand-hover: #5177E0;
+  --border: rgba(255, 255, 255, 0.10);
+}
+:root[data-theme="light"] {
+  --bg: var(--paper);
+  --bg-surface: #ffffff;
+  --bg-elevated: var(--paper-dim);
+  --fg: var(--ink);
+  --fg-muted: var(--mist);
+  --brand: var(--trust-blue);
+  --brand-hover: #17306E;
+  --border: var(--hairline);
+}
 
+/* Expose tokens as Tailwind theme values so utilities like
+   `bg-brand`, `text-fg`, `border-hairline` work.               */
+@theme inline {
+  --color-ink: var(--ink);
+  --color-trust-blue: var(--trust-blue);
+  --color-trust-blue-light: var(--trust-blue-light);
+  --color-signal-red: var(--signal-red);
+  --color-signal-red-strong: var(--signal-red-strong);
+  --color-paper: var(--paper);
+  --color-paper-dim: var(--paper-dim);
+  --color-ink-dim: var(--ink-dim);
+  --color-mist: var(--mist);
+
+  --color-bg: var(--bg);
+  --color-bg-surface: var(--bg-surface);
+  --color-bg-elevated: var(--bg-elevated);
+  --color-fg: var(--fg);
+  --color-fg-muted: var(--fg-muted);
+  --color-brand: var(--brand);
+  --color-brand-hover: var(--brand-hover);
+  --color-hairline: var(--border);
+
+  --font-display: var(--font-fraunces), Georgia, "Times New Roman", serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+/* Base */
+html {
+  font-size: calc(16px * var(--type-scale));
+  -webkit-text-size-adjust: 100%;
+}
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans);
+  line-height: 1.65;
+  font-feature-settings: "cv11", "ss01", "ss03";
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  letter-spacing: -0.015em;
+  line-height: 1.15;
+  color: var(--fg);
+}
+
+/* Visible, accessible focus for keyboard nav */
+:where(a, button, [role="button"], input, textarea, select, summary):focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* Reduce motion — hard requirement (spec §1.5) */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .pulse-line-anim { animation: none !important; }
+}
+
+/* Pulse Line — signature motif (spec §1.4) */
+.pulse-line-svg path {
+  stroke: var(--brand);
+  stroke-width: 1.5;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.pulse-line-anim path {
+  stroke-dasharray: 2000;
+  stroke-dashoffset: 2000;
+  animation: pulseDraw 3.2s var(--ease-out) forwards;
+}
+@keyframes pulseDraw {
+  to { stroke-dashoffset: 0; }
+}
+
+/* Ambient pulse — slow horizontal drift as background motif */
+.pulse-line-ambient path {
+  opacity: 0.35;
+  animation: pulseAmbient 6s var(--ease-out) infinite;
+}
+@keyframes pulseAmbient {
+  0%, 100% { opacity: 0.25; }
+  50%      { opacity: 0.55; }
+}
+
+/* Hero entrance stagger */
+.hero-stagger > * {
+  opacity: 0;
+  transform: translateY(12px);
+  animation: staggerIn var(--dur-slow) var(--ease-out) forwards;
+}
+.hero-stagger > *:nth-child(1) { animation-delay: 40ms; }
+.hero-stagger > *:nth-child(2) { animation-delay: 220ms; }
+.hero-stagger > *:nth-child(3) { animation-delay: 380ms; }
+.hero-stagger > *:nth-child(4) { animation-delay: 520ms; }
+@keyframes staggerIn {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Scroll-reveal (applied by IntersectionObserver in Reveal.tsx) */
+.reveal {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity var(--dur-med) var(--ease-out), transform var(--dur-med) var(--ease-out);
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Utility: hairline section divider with a small label (spec §1.3) */
+.section-rule {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--fg-muted);
+  font-size: 0.75rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.section-rule::before,
+.section-rule::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* Selection */
+::selection {
+  background: color-mix(in oklab, var(--brand) 25%, transparent);
+  color: var(--fg);
+}
+
+/* Visible scrollbar for the chat message list — otherwise on macOS/iOS
+   the scrollbar only appears while actively dragging, which makes users
+   think the panel isn't scrollable. */
+.chat-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: var(--fg-muted) transparent;
+}
+.chat-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+.chat-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.chat-scroll::-webkit-scrollbar-thumb {
+  background-color: color-mix(in oklab, var(--fg-muted) 60%, transparent);
+  border-radius: 4px;
+  border: 2px solid var(--bg-surface);
+}
+.chat-scroll::-webkit-scrollbar-thumb:hover {
+  background-color: var(--fg-muted);
 }
