@@ -189,3 +189,58 @@ export async function getActiveWhatsAppInvite() {
     .limit(1);
   return rows[0]?.inviteUrl ?? "https://chat.whatsapp.com/IkB8sF0vISwETjXgfRpLY4";
 }
+
+/**
+ * Typed readers backed by the `site_settings` JSONB table. Each returns
+ * the file default from src/lib/site-settings.ts if the DB row is missing,
+ * so the site never renders blank on a fresh install and the admin editor
+ * can bootstrap from those defaults on first save.
+ *
+ * Keys are kept short and stable — changing them will orphan admin edits.
+ */
+export type HomeHero = {
+  eyebrow: string;
+  headline: string;
+  headlineAccent: string;
+  subhead: string;
+};
+
+export type ContactInfo = {
+  phone: string;
+  emergencyPhone: string;
+  email: string;
+  instagram: string;
+  instagramHandle: string;
+};
+
+async function readSetting<T>(key: string): Promise<T | null> {
+  try {
+    const rows = await db
+      .select()
+      .from(schema.siteSettings)
+      .where(eq(schema.siteSettings.key, key))
+      .limit(1);
+    return (rows[0]?.value as T) ?? null;
+  } catch {
+    return null;
+  }
+}
+
+export async function getHomeHero(): Promise<HomeHero> {
+  const { HOME_HERO } = await import("./site-settings");
+  const stored = await readSetting<Partial<HomeHero>>("home_hero");
+  return { ...HOME_HERO, ...(stored ?? {}) };
+}
+
+export async function getContactInfo(): Promise<ContactInfo> {
+  const { CONTACT } = await import("./site-settings");
+  const stored = await readSetting<Partial<ContactInfo>>("contact_info");
+  return {
+    phone: CONTACT.phone,
+    emergencyPhone: CONTACT.emergencyPhone,
+    email: CONTACT.email,
+    instagram: CONTACT.instagram,
+    instagramHandle: CONTACT.instagramHandle,
+    ...(stored ?? {}),
+  };
+}

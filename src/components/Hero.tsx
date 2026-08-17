@@ -1,7 +1,23 @@
 import Link from "next/link";
 import { PulseLine } from "./PulseLine";
+import { HOME_HERO } from "@/lib/site-settings";
 
-export function Hero() {
+/**
+ * Home hero. Copy defaults come from site-settings.ts. When the admin edits
+ * the "home_hero" DB row, /app/page.tsx passes those overrides in as props
+ * — the Hero itself stays a pure server component with no DB awareness.
+ */
+export function Hero({
+  eyebrow = HOME_HERO.eyebrow,
+  headline = HOME_HERO.headline,
+  headlineAccent = HOME_HERO.headlineAccent,
+  subhead = HOME_HERO.subhead,
+}: {
+  eyebrow?: string;
+  headline?: string;
+  headlineAccent?: string;
+  subhead?: string;
+} = {}) {
   return (
     <section className="relative overflow-hidden">
       {/* Ambient pulse line behind the hero content */}
@@ -25,19 +41,16 @@ export function Hero() {
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 py-20 md:py-28 lg:py-36">
         <div className="hero-stagger max-w-4xl">
           <div className="section-rule mb-6" style={{ maxWidth: "20rem" }}>
-            <span>Jude Mental Health Society</span>
+            <span>{eyebrow}</span>
           </div>
 
           <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-medium tracking-tight leading-[1.05]">
-            Every word can make a difference.{" "}
-            <span className="text-brand">Every voice matters.</span>
+            {headline}{" "}
+            <span className="text-brand">{headlineAccent}</span>
           </h1>
 
           <p className="mt-6 text-lg md:text-xl text-fg-muted max-w-2xl leading-relaxed">
-            An independent Nigerian mental health advocacy initiative founded in
-            memory of Jude Anuoluwa. We promote conversations that educate,
-            reduce stigma, and foster communities where seeking help is
-            recognised as a sign of strength.
+            {subhead}
           </p>
 
           <div className="mt-9 flex flex-wrap items-center gap-3">

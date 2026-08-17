@@ -11,6 +11,7 @@ export function CrisisButton({ className = "" }: { className?: string }) {
     <Link
       href="/emergency"
       prefetch
+      data-track="crisis-get-help"
       className={`inline-flex items-center gap-2 rounded-full bg-signal-red px-4 py-2 text-sm font-semibold text-white shadow-sm ring-1 ring-signal-red-strong/20 hover:bg-signal-red-strong focus-visible:outline-signal-red transition-colors ${className}`}
       aria-label="Get help now — emergency support"
     >

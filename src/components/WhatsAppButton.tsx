@@ -22,6 +22,7 @@ export async function WhatsAppButton({
       href={href}
       target="_blank"
       rel="noopener noreferrer"
+      data-track="whatsapp-join"
       className={`inline-flex items-center gap-1.5 rounded-full bg-[#25D366] text-white font-semibold hover:bg-[#1EBE5A] transition-colors ${cls} ${className}`}
     >
       <svg viewBox="0 0 24 24" className={size === "lg" ? "h-5 w-5" : "h-4 w-4"} fill="currentColor" aria-hidden="true">

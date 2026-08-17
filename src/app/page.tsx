@@ -5,7 +5,7 @@ import { QuickPaths } from "@/components/QuickPaths";
 import { Reveal } from "@/components/Reveal";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { PulseLine } from "@/components/PulseLine";
-import { getAnnouncements, getResources, getUpcomingLectures } from "@/lib/public-data";
+import { getAnnouncements, getHomeHero, getResources, getUpcomingLectures } from "@/lib/public-data";
 import { COMPETITION } from "@/lib/site-settings";
 
 function formatDate(iso: string) {
@@ -15,10 +15,11 @@ function formatDate(iso: string) {
 }
 
 export default async function Home() {
-  const [announcements, resources, upcomingLectures] = await Promise.all([
+  const [announcements, resources, upcomingLectures, hero] = await Promise.all([
     getAnnouncements(),
     getResources(),
     getUpcomingLectures(),
+    getHomeHero(),
   ]);
   const latest = announcements.slice(0, 3);
   const featuredResources = resources.slice(0, 3);
@@ -26,7 +27,7 @@ export default async function Home() {
 
   return (
     <>
-      <Hero />
+      <Hero {...hero} />
       <ImpactCounter />
 
       {/* Latest from JMHS */}
@@ -181,9 +182,10 @@ export default async function Home() {
                 Turn what you've lived through into something someone else needs to read.
               </h2>
               <p className="mt-5 text-fg-muted text-lg leading-relaxed max-w-2xl">
-                Poetry, short stories, essays, or personal narratives — every entry
-                becomes part of an advocacy library that reduces stigma and helps
-                people feel less alone.
+                Essays, poetry, short stories, spoken-word scripts, letters,
+                personal reflections — nine categories, open to everyone. Every
+                consenting entry becomes part of an advocacy library that
+                reduces stigma and helps people feel less alone.
               </p>
               <dl className="mt-8 grid gap-6 sm:grid-cols-3">
                 <div>

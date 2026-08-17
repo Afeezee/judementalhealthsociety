@@ -15,6 +15,7 @@ type NavItem = { href: string; label: string; role?: Role };
 
 const NAV: NavItem[] = [
   { href: "/admin", label: "Overview" },
+  { href: "/admin/analytics", label: "Analytics", role: "website_administrator" },
   { href: "/admin/announcements", label: "Announcements", role: "content_editor" },
   { href: "/admin/lectures", label: "Monthly Lectures", role: "content_editor" },
   { href: "/admin/resources", label: "Resource Centre", role: "content_editor" },
@@ -22,6 +23,7 @@ const NAV: NavItem[] = [
   { href: "/admin/forum", label: "Forum moderation", role: "moderator" },
   { href: "/admin/directory", label: "Professional directory", role: "content_editor" },
   { href: "/admin/impact", label: "Impact counter", role: "content_editor" },
+  { href: "/admin/content", label: "Content editor", role: "content_editor" },
   { href: "/admin/whatsapp", label: "WhatsApp settings", role: "website_administrator" },
   { href: "/admin/users", label: "Users & roles", role: "super_admin" },
   { href: "/admin/settings", label: "Site settings", role: "website_administrator" },

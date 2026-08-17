@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { ContactForm } from "@/components/ContactForm";
 import { CrisisButton } from "@/components/CrisisButton";
-import { CONTACT } from "@/lib/site-settings";
+import { getContactInfo } from "@/lib/public-data";
 
 export const metadata: Metadata = {
   title: "Contact JMHS",
@@ -9,7 +9,9 @@ export const metadata: Metadata = {
     "Get in touch with JMHS for general enquiries, competition questions, professional listings, or partnership opportunities.",
 };
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  // DB-backed so /admin/content can edit these without a code push.
+  const CONTACT = await getContactInfo();
   return (
     <>
       {/* Explicit distinction from the crisis line — spec §2.14 */}

@@ -367,3 +367,39 @@ export const whatsappSettings = pgTable("whatsapp_settings", {
   active: boolean("active").notNull().default(true),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 });
+
+// ---------- Analytics ----------
+// Lightweight, PII-free page-view + link-click tracking. We deliberately
+// don't store IP, user agent, or Clerk userId — just the path viewed,
+// the click target key, a short random session id (per browser tab), and
+// same-origin referrer. Enough for real product decisions, nothing more.
+
+export const analyticsEventTypeEnum = pgEnum("analytics_event_type", [
+  "page_view",
+  "link_click",
+]);
+
+export const analyticsEvents = pgTable(
+  "analytics_events",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    type: analyticsEventTypeEnum("type").notNull(),
+    path: varchar("path", { length: 500 }).notNull(),
+    // For link_click: a slug describing the link (e.g. "sculptform-submit",
+    // "whatsapp-cta", "crisis-help"). For page_view: empty string.
+    target: varchar("target", { length: 200 }).notNull().default(""),
+    // Short random id generated client-side (sessionStorage, per-tab).
+    // Lets us de-duplicate double-fires and count unique sessions without
+    // any cross-session tracking.
+    sessionId: varchar("session_id", { length: 32 }).notNull().default(""),
+    // Only stored when it's same-origin, to preserve referral chains
+    // inside the site while never logging where visitors came from.
+    referrer: varchar("referrer", { length: 500 }).notNull().default(""),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (t) => [
+    index("analytics_created_idx").on(t.createdAt),
+    index("analytics_type_path_idx").on(t.type, t.path),
+    index("analytics_target_idx").on(t.target),
+  ]
+);

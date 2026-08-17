@@ -3,15 +3,8 @@ import { LogoMark } from "./Logo";
 import { QuickExitButton } from "./QuickExitButton";
 import { WhatsAppButton } from "./WhatsAppButton";
 import { ImpactStrip } from "./ImpactStrip";
-
-const CONTACT = {
-  phone: "+234 701 462 3270",
-  emergency: "+234 813 958 2323",
-  instagram: "https://instagram.com/judementalhealthsociety",
-  instagramHandle: "@judementalhealthsociety",
-  domain: "judementalhealthsociety.org",
-  email: "hello@judementalhealthsociety.org",
-};
+import { getContactInfo } from "@/lib/public-data";
+import { CONTACT as CONTACT_DEFAULT } from "@/lib/site-settings";
 
 const COLS = [
   {
@@ -43,7 +36,10 @@ const COLS = [
   },
 ];
 
-export function Footer() {
+export async function Footer() {
+  // Contact info comes from the DB with the file-level default as fallback,
+  // so /admin/content edits show up in the footer without a code deploy.
+  const CONTACT = { ...CONTACT_DEFAULT, ...(await getContactInfo()) };
   return (
     <footer className="mt-24 border-t border-hairline bg-bg-surface">
       {/* Condensed impact strip (spec §2.10) */}

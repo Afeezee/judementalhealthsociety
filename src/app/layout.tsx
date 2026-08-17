@@ -1,12 +1,14 @@
 import type { Metadata, Viewport } from "next";
 import { Fraunces, Inter } from "next/font/google";
 import Script from "next/script";
+import { Suspense } from "react";
 import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { AnnouncementsStrip } from "@/components/AnnouncementsStrip";
 import { ChatBubble } from "@/components/ChatBubble";
+import { AnalyticsBeacon } from "@/components/AnalyticsBeacon";
 import { getStripAnnouncements } from "@/lib/public-data";
 
 const inter = Inter({
@@ -22,6 +24,18 @@ const fraunces = Fraunces({
   axes: ["opsz", "SOFT"],
 });
 
+/**
+ * Root metadata.
+ *
+ * - `title.template` gives every child page an automatic " · Jude Mental
+ *   Health Society" suffix, so per-page metadata sets `title` bare.
+ * - openGraph deliberately omits `images` — the file-based icon and OG
+ *   image conventions (src/app/icon.png, src/app/apple-icon.png,
+ *   src/app/opengraph-image.tsx) auto-generate the correct tags. Setting
+ *   them explicitly here would suppress the file convention.
+ * - twitter uses summary_large_image so the OG card renders full-width
+ *   on X, LinkedIn, Slack, and WhatsApp previews.
+ */
 export const metadata: Metadata = {
   title: {
     default: "Jude Mental Health Society — Every voice matters",
@@ -30,15 +44,30 @@ export const metadata: Metadata = {
   description:
     "An independent Nigerian mental health advocacy initiative founded in memory of Jude Anuoluwa. Education, lectures, resources, community, and the JMHS National Writing Competition.",
   metadataBase: new URL("https://judementalhealthsociety.org"),
+  applicationName: "Jude Mental Health Society",
+  keywords: [
+    "mental health Nigeria",
+    "suicide prevention",
+    "mental health advocacy",
+    "JMHS",
+    "Jude Anuoluwa",
+    "writing competition",
+    "monthly mental health lecture",
+  ],
   openGraph: {
     title: "Jude Mental Health Society",
     description:
       "Transforming loss into purpose — promoting mental health conversations, reducing stigma, and advocating for suicide prevention.",
+    url: "https://judementalhealthsociety.org",
+    siteName: "Jude Mental Health Society",
     type: "website",
-    images: [{ url: "/jmhs-logo.png", width: 1500, height: 1000, alt: "Jude Mental Health Society" }],
+    locale: "en_NG",
   },
-  icons: {
-    icon: "/jmhs-logo.png",
+  twitter: {
+    card: "summary_large_image",
+    title: "Jude Mental Health Society",
+    description:
+      "Every word can make a difference. Every voice matters.",
   },
   robots: { index: true, follow: true },
 };
@@ -106,6 +135,14 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
           <Footer />
           {/* Floating AI Companion — decides per-route whether to render */}
           <ChatBubble />
+          {/*
+            Page-view + tracked-link-click beacon. Suspense-wrapped because
+            AnalyticsBeacon reads useSearchParams, which would otherwise
+            force every page out of static generation.
+          */}
+          <Suspense fallback={null}>
+            <AnalyticsBeacon />
+          </Suspense>
         </body>
       </html>
     </ClerkProvider>
